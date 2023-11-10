@@ -1,0 +1,11 @@
+# Never commit the statefile, makes no sense
+state.yaml
+
+# Never commit credentials! Ever!
+credentials.py
+
+# Never commit logfile
+orfodon_service.log
+
+# ...or python cache, nonsense
+__pycache__
