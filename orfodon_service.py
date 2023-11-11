@@ -176,14 +176,17 @@ def load_feeds():
                     if "boosted" in oldPosting:
                         boosted = oldPosting["boosted"]
                 
-                for tagr in entry.get('tags'):
-                    tag = tagr["term"] \
-                            .replace(" ", "") \
-                            .replace(".", "") \
-                            .replace("-", "") \
-                            .replace("&", "") \
-                            .replace(":", "")
-                    hashtags.append('#{}'.format(tag))
+                ttags = entry.get('tags')
+                
+                if not ttags is None:
+                    for tagr in entry.get('tags'):
+                        tag = tagr["term"] \
+                                .replace(" ", "") \
+                                .replace(".", "") \
+                                .replace("-", "") \
+                                .replace("&", "") \
+                                .replace(":", "")
+                        hashtags.append('#{}'.format(tag))
                 
                 if text and len(text) > 0:
                     raw_posting = text
