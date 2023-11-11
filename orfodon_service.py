@@ -22,6 +22,8 @@
 # https://cymaphore.net
 #
 # @todo Secondary urls like https://vorarlberg.orf.at/radio/stories/3231551/
+# @todo Sort news in descending order by date when bulk processing
+# @todo A better ÖWA-Category to Tags converter
 #
 
 #############################################################################
@@ -284,6 +286,12 @@ def post_feeds():
             access_token=cred['access_token']
         )
         
+        filterbots = {}
+        
+        if "filterbots" in feed:
+            for filterbot in feed["filterbots"].keys():
+                filterbots[filterbot] = []
+        
         for posting_id in state[feed["id"]]:
             posting = state[feed["id"]][posting_id]
             boosted = False
@@ -307,8 +315,12 @@ def post_feeds():
                                 else:
                                     print("DRYRUN: not executing: instance.status_reblog(\"" + original_posting["status_id"] + "\")")
                             except:
-                                print(timestamp() + " Exception wile instance.status_reblog()")
+                                print(timestamp() + " EXCEPTION wile instance.status_reblog()")
                                 print(original_posting)
+                            for filterbot in filterbots:
+                                for fb_prefix in feed["filterbots"][filterbot]:
+                                    if fb_prefix == original_posting["url"][:len(fb_prefix)]:
+                                        filterbots[filterbot].append(original_posting["status_id"])
                         else:
                             print(timestamp() + " ERROR Missing status_id")
                             print(original_posting)
@@ -336,6 +348,10 @@ def post_feeds():
                         except:
                             print(timestamp() + " EXCEPTION while instance.status_reblog()")
                             print(backref_posting)
+                        for filterbot in filterbots:
+                            for fb_prefix in feed["filterbots"][filterbot]:
+                                if fb_prefix == backref_posting["url"][:len(fb_prefix)]:
+                                    filterbots[filterbot].append(backref_posting["status_id"])
                     else:
                         print(timestamp() + " ERROR Missing status_id")
                         print(backref_posting)
@@ -356,6 +372,8 @@ def post_feeds():
                             print("DRYRUN: not executing: instance.status_post(\"" + posting["post_text"] + "\")")
                             status = {"id": 0}
                         posting["status_id"] = status["id"]
+                        for filterbot in filterbots:
+                            filterbots[filterbot].append(status["id"])
                     except:
                         print(timestamp() + " EXCEPTION while instance.status_post()")
                         print(posting)
@@ -381,6 +399,32 @@ def post_feeds():
                         print(posting)
                     
                 posting["edited"] = False
+        
+        if "filterbots" in feed:
+            for filterbot in feed["filterbots"].keys():
+                if len(filterbots[filterbot]) > 0:
+                    cred = credentials[filterbot]
+                    
+                    instance = Mastodon(
+                        api_base_url=cred['instance'],
+                        client_id=cred['client_id'],
+                        client_secret=cred['client_secret'],
+                        access_token=cred['access_token']
+                    )
+                    for status_id in filterbots[filterbot]:
+                        print("==============================================================================")
+                        print(timestamp() + " -> BOOST filterbot to " + filterbot + ": " + str(status_id))
+                        
+                        try:
+                            if config["enable_mastodon"]:
+                                status = instance.status_reblog(status_id)
+                            else:
+                                print("DRYRUN: not executing: instance.status_reblog(\"" + str(status_id) + "\")")
+                        except:
+                            print(timestamp() + " EXCEPTION while instance.status_reblog()")
+                            print(str(status_id))
+                        
+
 
 #############################################################################
 
