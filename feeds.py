@@ -92,6 +92,7 @@ feeds = [
         'url': 'https://rss.orf.at/news.xml',
         'filterbots': {
             'news_lite': [
+                'https://oesterreich.orf.at/stories/'
             ],
             'news_liteplus': [
                 'https://burgenland.orf.at/stories/',
@@ -102,7 +103,8 @@ feeds = [
                 'https://steiermark.orf.at/stories/',
                 'https://tirol.orf.at/stories/',
                 'https://vorarlberg.orf.at/stories/',
-                'https://wien.orf.at/stories/'
+                'https://wien.orf.at/stories/',
+                'https://oesterreich.orf.at/stories/'
             ]
         }
     }

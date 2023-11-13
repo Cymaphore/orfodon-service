@@ -21,7 +21,7 @@
 # @cymaphore@i.cymaphore.net
 # https://cymaphore.net
 #
-# @todo Secondary urls like https://vorarlberg.orf.at/radio/stories/3231551/
+# @todo Secondary urls like https://vorarlberg.orf.at/radio/stories/3231551/ https://steiermark.orf.at/magazin/stories/3232156/
 # @todo Sort news in descending order by date when bulk processing
 # @todo A better ÖWA-Category to Tags converter
 #
