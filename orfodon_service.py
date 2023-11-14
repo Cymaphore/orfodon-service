@@ -24,6 +24,7 @@
 # @todo Secondary urls like https://vorarlberg.orf.at/radio/stories/3231551/ https://steiermark.orf.at/magazin/stories/3232156/
 # @todo Sort news in descending order by date when bulk processing
 # @todo A better ÖWA-Category to Tags converter
+# @todo Split category with : to generate separate hashtags
 #
 
 #############################################################################
@@ -187,6 +188,7 @@ def load_feeds():
                                 .replace(".", "") \
                                 .replace("-", "") \
                                 .replace("&", "") \
+                                .replace("/", "") \
                                 .replace(":", "")
                         hashtags.append('#{}'.format(tag))
                 
