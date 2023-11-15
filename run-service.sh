@@ -9,8 +9,6 @@
 #
 # To be run from a cron job
 #
-# @todo extract top hashtags from current posts and add them to profile
-#
 
 ## Location of orfodon_service.py
 SERVICE_PATH="/usr/local/orfodon-service/orfodon_service/"
