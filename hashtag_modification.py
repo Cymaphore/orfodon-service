@@ -10,5 +10,8 @@ hashtag_replace = {
 
 ## Blacklist hashtags for categories
 hashtag_blacklist = [
-    "#Bildende"
+    "#Bildende",
+    "#Nachrichten",
+    "#MedienUndWerbung",
+    "#KulturUndFreizeit",
 ]

@@ -181,6 +181,16 @@ def load_feeds():
                     if "boosted" in oldPosting:
                         boosted = oldPosting["boosted"]
                 
+                try:
+                    ttags = entry.get('orfon_oewacategory', {}).get("rdf:resource", '')
+                    if not ttags is None and not ttags == "":
+                        ttags = ttags.split(":")[3].split("/")
+                        if not ttags[0] is None:
+                            hashtags.append('#{}'.format(ttags[0]))
+                            #pprint(ttags[1])
+                except:
+                    ()
+                
                 ttags = entry.get('tags')
                 
                 if not ttags is None:
@@ -194,12 +204,6 @@ def load_feeds():
                                     .replace(":", "")
                             hashtags.append('#{}'.format(tag))
 
-                ## For future usage ;-)
-                #ttags = entry.get('orfon_oewacategory', {}).get("rdf:resource", '')
-                #if not ttags is None and not ttags == "":
-                #    ttags = ttags.split(":")[3].split("/")
-                #    print(ttags)
-                
                 if "additional_hashtags" in feed:
                     hashtags.extend(feed["additional_hashtags"])
                 
