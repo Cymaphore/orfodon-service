@@ -23,8 +23,8 @@
 #
 # @todo Secondary urls like https://vorarlberg.orf.at/radio/stories/3231551/ https://steiermark.orf.at/magazin/stories/3232156/
 # @todo Sort news in descending order by date when bulk processing
-# @todo A better ÖWA-Category to Tags converter
-# @todo Split category with : to generate separate hashtags
+# @todo Account mentioner ("der Standard" --> @derStandard)?
+# @todo extract top hashtags from current posts and add them to profile
 #
 
 #############################################################################
@@ -50,6 +50,8 @@ from pprint import pprint
 from config import config
 from credentials import credentials
 from feeds import feeds
+from hashtag_modification import hashtag_replace
+from hashtag_modification import hashtag_blacklist
 
 #############################################################################
 
@@ -182,15 +184,42 @@ def load_feeds():
                 ttags = entry.get('tags')
                 
                 if not ttags is None:
-                    for tagr in entry.get('tags'):
-                        tag = tagr["term"] \
-                                .replace(" ", "") \
-                                .replace(".", "") \
-                                .replace("-", "") \
-                                .replace("&", "") \
-                                .replace("/", "") \
-                                .replace(":", "")
-                        hashtags.append('#{}'.format(tag))
+                    for tag1 in entry.get('tags'):
+                        for tag2 in tag1["term"].split(" "):
+                            tag = tag2 \
+                                    .replace(".", "") \
+                                    .replace("-", "") \
+                                    .replace("&", "") \
+                                    .replace("/", "") \
+                                    .replace(":", "")
+                            hashtags.append('#{}'.format(tag))
+
+                ## For future usage ;-)
+                #ttags = entry.get('orfon_oewacategory', {}).get("rdf:resource", '')
+                #if not ttags is None and not ttags == "":
+                #    ttags = ttags.split(":")[3].split("/")
+                #    print(ttags)
+                
+                if "additional_hashtags" in feed:
+                    hashtags.extend(feed["additional_hashtags"])
+                
+                for tagi in range(len(hashtags)):
+                    if hashtags[tagi] in hashtag_replace:
+                        hashtags[tagi] = copy.copy(hashtag_replace[hashtags[tagi]])
+                
+                hashtags = list(dict.fromkeys(hashtags))
+                try:
+                    hashtags.remove("#")
+                except:
+                    ()
+                
+                for bt in hashtag_blacklist:
+                    try:
+                        hashtags.remove(bt)
+                    except:
+                        ()
+                
+                #pprint(hashtags)
                 
                 if text and len(text) > 0:
                     raw_posting = text
@@ -207,12 +236,14 @@ def load_feeds():
                     edited = True
                 
                 if edited or not posted:
+                    cu_posting = cleanup(raw_posting, hashtags)
+                    
                     hashlist = " ".join(hashtags)
-                    post_text = limit_text(cleanup(raw_posting).strip(), 495 - (len(" " + url + " " + hashlist)), ' (…)') + ' ' + url + " " + hashlist
+                    post_text = limit_text(cu_posting.strip(), 495 - (len(" " + url + " " + hashlist)), ' (…)') + ' ' + url + " " + hashlist
                 
                 posting = {
                     'text': raw_posting,
-                    'post_text': post_text,
+                    'post_text': post_text.strip(),
                     'url': url,
                     'post_type_text': post_type_text,
                     'hashtags': hashtags,
@@ -493,18 +524,25 @@ def limit_text(text, max_len=500, suffix='...'):
 ##
 # Cleanup rss feed article, remove HTML, fix whitespaces
 # and add hashtags
-def cleanup(text):
+def cleanup(text, hashtags):
     html = BeautifulSoup(text, 'html.parser')
     text = html.get_text()
     text = re.sub('\xa0+', ' ', text)
     text = re.sub('  +', ' ', text)
     text = re.sub(' +\n', '\n', text)
     text = re.sub('\n\n\n+', '\n\n', text, flags=re.M)
+    
     global hashtag_wordlist
+    
     for wrd in hashtag_wordlist:
         wrd = wrd.strip()
         if wrd != "" and wrd[0] != '#':
-            text = re.sub(r'\b'+wrd+r'\b(?!@)', '#'+wrd, text, 1)
+            text = re.sub(r'\b' + wrd + r'\b(?!@)', '#' + wrd, text, 1)
+    
+    for ht in hashtags:
+        if re.search(r"\b" + re.escape(ht) + r"\b", text):
+            hashtags.remove(ht)
+    
     return text.strip()
 
 #############################################################################
