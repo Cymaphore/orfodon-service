@@ -68,17 +68,20 @@ feeds = [
     {
         'id': 'science',
         'url': 'https://rss.orf.at/science.xml',
-        'prefix': 'https://science.orf.at/stories/'
+        'prefix': 'https://science.orf.at/stories/',
+        'additional_hashtags': [ "#Wissenschaft" ]
     },
     {
         'id': 'religion',
         'url': 'https://rss.orf.at/religion.xml',
-        'prefix': 'https://religion.orf.at/stories/'
+        'prefix': 'https://religion.orf.at/stories/',
+        'additional_hashtags': [ "#Religion" ]
     },
     {
         'id': 'sport',
         'url': 'https://rss.orf.at/sport.xml',
-        'prefix': 'https://sport.orf.at/stories/'
+        'prefix': 'https://sport.orf.at/stories/',
+        'additional_hashtags': [ "#Sport" ]
     },
     
     # Hauptfeeds
