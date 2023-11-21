@@ -551,9 +551,13 @@ def cleanup(text, hashtags):
         if wrd != "" and wrd[0] != '#':
             text = re.sub(r'\b' + wrd + r'\b(?!@)', '#' + wrd, text, 1)
     
+    ht_bl2 = []
+    
     for ht in hashtags:
         if re.search(r"\b" + re.escape(ht[1:]) + r"\b", text):
-            hashtags.remove(ht)
+            ht_bl2.append(ht)
+    for ht in ht_bl2:
+        hashtags.remove(ht)
     
     return text.strip()
 
