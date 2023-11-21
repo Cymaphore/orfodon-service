@@ -111,6 +111,7 @@ def load_hashtags():
 def load_state():
     global state
     global oldState
+    global hashtag_wordlist
     
     try:
         with open(config["files"]["state"]) as fh:
@@ -206,6 +207,13 @@ def load_feeds():
 
                 if "additional_hashtags" in feed:
                     hashtags.extend(feed["additional_hashtags"])
+
+                try:
+                    for ht in hashtag_wordlist:
+                        if re.search(r"\b" + re.escape(ht) + r"\b", title):
+                            hashtags.append("#" + ht)
+                except:
+                    ()
                 
                 for tagi in range(len(hashtags)):
                     if hashtags[tagi] in hashtag_replace:
@@ -544,7 +552,7 @@ def cleanup(text, hashtags):
             text = re.sub(r'\b' + wrd + r'\b(?!@)', '#' + wrd, text, 1)
     
     for ht in hashtags:
-        if re.search(r"\b" + re.escape(ht) + r"\b", text):
+        if re.search(r"\b" + re.escape(ht[1:]) + r"\b", text):
             hashtags.remove(ht)
     
     return text.strip()
