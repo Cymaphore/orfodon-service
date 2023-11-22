@@ -38,6 +38,7 @@ import yaml
 import copy
 import feedparser
 from datetime import datetime
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -235,15 +236,36 @@ def load_feeds():
                 
                 #pprint(hashtags)
                 
+                ts_story_details = 0
+                if "ts_story_details" in oldPosting:
+                    ts_story_details = oldPosting["ts_story_details"]
+                
                 if text and len(text) > 0:
                     raw_posting = text
                     post_type_text = True
                 else:
                     if "boost_target" in oldPosting and len(oldPosting["boost_target"]) > 0:
                         boost_target = oldPosting["boost_target"]
+                        if "ts_story_details" in oldPosting:
+                            if ts_story_details < ts() - 600:
+                                story_details = get_story_details(url)
+                                ts_story_details = ts()
+                                if len(story_details["text"]) >= len(title):
+                                    raw_posting = story_details["text"]
+                                else:
+                                    raw_posting = title
+                        elif "text" in oldPosting and len(oldPosting["text"]) > 0:
+                            raw_posting = oldPosting["text"]
+                        else:
+                            raw_posting = title
                     else:
-                        boost_target = get_sub_story_url(url)
-                    raw_posting = title
+                        story_details = get_story_details(url)
+                        ts_story_details = ts()
+                        boost_target = story_details["url"]
+                        if len(story_details["text"]) >= len(title):
+                            raw_posting = story_details["text"]
+                        else:
+                            raw_posting = title
                     post_type_text = False
                     
                 if "text" in oldPosting and raw_posting != oldPosting["text"]:
@@ -266,7 +288,8 @@ def load_feeds():
                     'edited': edited,
                     'posted': posted,
                     'status_id': status_id,
-                    'boosted': boosted
+                    'boosted': boosted,
+                    'ts_story_details': ts_story_details
                     }
                 
                 feedState[url] = posting
@@ -360,7 +383,7 @@ def post_feeds():
                                 if config["enable_mastodon"]:
                                     status = instance.status_reblog(original_posting["status_id"])
                                 else:
-                                    print("DRYRUN: not executing: instance.status_reblog(\"" + original_posting["status_id"] + "\")")
+                                    print("DRYRUN: not executing: instance.status_reblog() ID \"" + original_posting["status_id"] + "\"")
                             except:
                                 print(timestamp() + " EXCEPTION wile instance.status_reblog()")
                                 print(original_posting)
@@ -390,7 +413,7 @@ def post_feeds():
                             if config["enable_mastodon"]:
                                 status = instance.status_reblog(backref_posting["status_id"])
                             else:
-                                print("DRYRUN: not executing: instance.status_reblog(\"" + backref_posting["status_id"] + "\")")
+                                print("DRYRUN: not executing: instance.status_reblog() ID \"" + backref_posting["status_id"] + "\"")
                                 
                         except:
                             print(timestamp() + " EXCEPTION while instance.status_reblog()")
@@ -416,7 +439,7 @@ def post_feeds():
                         if config["enable_mastodon"]:
                             status = instance.status_post(posting["post_text"])
                         else:
-                            print("DRYRUN: not executing: instance.status_post(\"" + posting["post_text"] + "\")")
+                            print("DRYRUN: not executing: instance.status_post()")
                             status = {"id": 0}
                         posting["status_id"] = status["id"]
                         for filterbot in filterbots:
@@ -438,7 +461,7 @@ def post_feeds():
                         if config["enable_mastodon"]:
                             status = instance.status_update(posting["status_id"], posting["post_text"])
                         else:
-                            print("DRYRUN: not executing: instance.status_update(\"" + posting["status_id"] + "\", \"" + posting["post_text"] + "\")")
+                            print("DRYRUN: not executing: instance.status_update() ID \"" + posting["status_id"] + "\"")
                             status = {"id": 0}
                         posting["status_id"] = status["id"]
                     except:
@@ -498,29 +521,42 @@ def get_canon_posting(posting):
 # a possible link to another article. Used to transform
 # Postings that are only referencing another article without adding
 # own news into boosts of the linked article.
-def get_sub_story_url(url):
+def get_story_details(url):
+    
+    retr = {
+        "url": "",
+        "text": ""
+    }
+    
     headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Max-Age': '3600',
         'User-Agent': config["user_agent"]
-        }
+    }
 
     if url is None:
-        return ""
+        return retr
+    
     req = requests.get(url, headers)
     soup = BeautifulSoup(req.content, 'html.parser')
     story = soup.find("div", {"class": config["crawl_class_story"]})
-    if story is None:
-        return ""
-    a = story.find("a");
-    if a is None:
-        return ""
-    if not "href" in a.attrs:
-        return ""
     
-    return a.attrs["href"]
+    if story is None:
+        return retr
+    
+    try:
+        retr["text"] = story.find("p").get_text()
+    except:
+        ()
+    
+    try:
+        retr["url"] = story.find("a").attrs["href"]
+    except:
+        ()
+    
+    return retr
 
 #############################################################################
 
@@ -569,6 +605,13 @@ def cleanup(text, hashtags):
 # Generate a timestamp for use in output/logging
 def timestamp():
     return datetime.now().strftime("[%Y-%m-%d_%H:%M:%S]")
+
+#############################################################################
+
+##
+# Generate unix timestamp
+def ts():
+    return int(time.time())
 
 #############################################################################
 
