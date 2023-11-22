@@ -22,9 +22,11 @@
 # https://cymaphore.net
 #
 # @todo Secondary urls like https://vorarlberg.orf.at/radio/stories/3231551/ https://steiermark.orf.at/magazin/stories/3232156/
-# @todo Sort news in descending order by date when bulk processing
+# @todo Sort news in descending order by date when bulk processing <-- low prio, usually not an issue
 # @todo Account mentioner ("der Standard" --> @derStandard)?
 # @todo extract top hashtags from current posts and add them to profile
+# @todo ORF_Topos as channel
+# @todo Read first paragraph for articles where only title is present
 #
 
 #############################################################################
