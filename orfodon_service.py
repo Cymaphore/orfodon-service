@@ -26,7 +26,6 @@
 # @todo Account mentioner ("der Standard" --> @derStandard)?
 # @todo extract top hashtags from current posts and add them to profile
 # @todo ORF_Topos as channel
-# @todo Read first paragraph for articles where only title is present
 #
 
 #############################################################################
