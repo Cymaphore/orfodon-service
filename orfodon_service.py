@@ -254,6 +254,8 @@ def load_feeds():
                                     raw_posting = story_details["text"]
                                 else:
                                     raw_posting = title
+                            else:
+                                raw_posting = oldPosting["text"]
                         elif "text" in oldPosting and len(oldPosting["text"]) > 0:
                             raw_posting = oldPosting["text"]
                         else:
