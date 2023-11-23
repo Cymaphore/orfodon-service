@@ -43,6 +43,8 @@ import requests
 from bs4 import BeautifulSoup
 from mastodon import Mastodon
 
+import hashlib
+
 from pprint import pprint
 
 #############################################################################
@@ -239,6 +241,16 @@ def load_feeds():
                 if "ts_story_details" in oldPosting:
                     ts_story_details = oldPosting["ts_story_details"]
                 
+                ec_story_details = 0
+                if "ec_story_details" in oldPosting:
+                    ec_story_details = oldPosting["ec_story_details"]
+                
+                checksum_story_details = []
+                if "checksum_story_details" in oldPosting:
+                    checksum_story_details = oldPosting["checksum_story_details"]
+                
+                has_story_details = False
+                
                 if text and len(text) > 0:
                     raw_posting = text
                     post_type_text = True
@@ -251,6 +263,7 @@ def load_feeds():
                                 ts_story_details = ts()
                                 if len(story_details["text"]) >= len(title):
                                     raw_posting = story_details["text"]
+                                    has_story_details = True
                                 else:
                                     raw_posting = title
                             else:
@@ -265,12 +278,20 @@ def load_feeds():
                         boost_target = story_details["url"]
                         if len(story_details["text"]) >= len(title):
                             raw_posting = story_details["text"]
+                            has_story_details = True
                         else:
                             raw_posting = title
                     post_type_text = False
                     
                 if "text" in oldPosting and raw_posting != oldPosting["text"]:
-                    edited = True
+                    if has_story_details and ec_story_details < 5:
+                        posting_checksum = hashlib.md5(raw_posting.encode("utf8")).hexdigest()
+                        if not posting_checksum in checksum_story_details:
+                            ec_story_details = ec_story_details + 1
+                            edited = True
+                            checksum_story_details.append(posting_checksum)
+                    elif not has_story_details:
+                        edited = True
                 
                 if edited or not posted:
                     cu_posting = cleanup(raw_posting, hashtags)
@@ -290,7 +311,9 @@ def load_feeds():
                     'posted': posted,
                     'status_id': status_id,
                     'boosted': boosted,
-                    'ts_story_details': ts_story_details
+                    'ts_story_details': ts_story_details,
+                    'ec_story_details': ec_story_details,
+                    'checksum_story_details': checksum_story_details
                     }
                 
                 feedState[url] = posting
