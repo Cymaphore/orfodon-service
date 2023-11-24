@@ -514,7 +514,7 @@ def post_feeds():
                     
             if posting["edited"] and not posting["boosted"]:
                 print("==============================================================================")
-                print(timestamp() + " ** EDIT on " + feed["id"] + ": " + posting["post_text"])
+                print(timestamp() + " ** EDIT on " + feed["id"] + ": " + posting["post_text"] + " ; LEN: " + str(len(posting["post_text"])) + ")")
                 
                 if "status_id" in posting and posting["status_id"] > 0:
                     try:
