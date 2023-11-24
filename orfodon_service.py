@@ -57,6 +57,8 @@ from credentials import credentials
 from feeds import feeds
 from hashtag_modification import hashtag_replace
 from hashtag_modification import hashtag_blacklist
+from hashtag_modification import category_aliases
+from hashtag_modification import oewa_sport_aliases
 
 #############################################################################
 
@@ -163,6 +165,7 @@ def load_feeds():
                 title = entry.get('title')
                 text = entry.get('summary')
                 url = entry.get('link')
+                category = entry.get('category')
                 raw_posting = ""
                 post_type_text = False
                 hashtags = []
@@ -187,15 +190,27 @@ def load_feeds():
                     if "boosted" in oldPosting:
                         boosted = oldPosting["boosted"]
                 
+                first_oewa = False
+                if "enable_oewa_sport" in feed and feed["enable_oewa_sport"]:
+                    first_oewa = True
                 try:
                     ttags = entry.get('orfon_oewacategory', {}).get("rdf:resource", '')
                     if not ttags is None and not ttags == "":
                         ttags = ttags.split(":")[3].split("/")
+                        if "enable_oewa_sport" in feed and feed["enable_oewa_sport"]:
+                            if not ttags[1] is None:
+                                category = ttags[1]
+                                category = oewa_sport_aliases.get(category, category)
                         if not ttags[0] is None:
                             hashtags.append('#{}'.format(ttags[0]))
+                            if not first_oewa:
+                                first_oewa = True
+                                category = ttags[0]
                             #pprint(ttags[1])
                 except:
                     ()
+                    
+                #category = entry.get("dc_subject", category)
                 
                 ttags = entry.get('tags')
                 
@@ -297,13 +312,33 @@ def load_feeds():
                 if edited or not posted:
                     cu_posting = cleanup(raw_posting, hashtags)
                     
+                    hashtags = list(dict.fromkeys(hashtags))
+                    
+                    if category in category_aliases:
+                        category = category_aliases[category]
+                    
+                    for hti in range(len(hashtags)):
+                        hashtags[hti] = hashtags[hti].replace("#", "#" + feed["hashtag_prefix"])
+                    
                     hashlist = " ".join(hashtags)
-                    post_text = limit_text(cu_posting.strip(), 495 - (len(" " + url + " " + hashlist)), ' (…)') + ' ' + url + " " + hashlist
+                    
+                    posting_data = {
+                        "text": "",
+                        "category": category,
+                        "url": url,
+                        "hashtags": hashlist,
+                    }
+                    
+                    avail_size = len(feed["template"].format(**posting_data).strip())
+                    posting_data["text"] = limit_text(cu_posting.strip(), config.get("message_size", 500) - avail_size, " (…)")
+                    post_text = feed["template"].format(**posting_data).strip()
+                    #print(len(post_text))
                 
                 posting = {
                     'text': raw_posting,
                     'post_text': post_text.strip(),
                     'url': url,
+                    'category': category,
                     'post_type_text': post_type_text,
                     'hashtags': hashtags,
                     'updated': updated,
@@ -408,7 +443,7 @@ def post_feeds():
                                 if config["enable_mastodon"]:
                                     status = instance.status_reblog(original_posting["status_id"])
                                 else:
-                                    print("DRYRUN: not executing: instance.status_reblog() ID \"" + original_posting["status_id"] + "\"")
+                                    ()#print("DRYRUN: not executing: instance.status_reblog() ID \"" + original_posting["status_id"] + "\"")
                             except:
                                 print(timestamp() + " EXCEPTION wile instance.status_reblog()")
                                 print(original_posting)
@@ -438,7 +473,7 @@ def post_feeds():
                             if config["enable_mastodon"]:
                                 status = instance.status_reblog(backref_posting["status_id"])
                             else:
-                                print("DRYRUN: not executing: instance.status_reblog() ID \"" + backref_posting["status_id"] + "\"")
+                                ()#print("DRYRUN: not executing: instance.status_reblog() ID \"" + backref_posting["status_id"] + "\"")
                                 
                         except:
                             print(timestamp() + " EXCEPTION while instance.status_reblog()")
@@ -458,13 +493,13 @@ def post_feeds():
                 if not boosted:
                     print("==============================================================================")
                     print(timestamp() + " ++ POST to " + feed["id"] + ": " + posting["post_text"])
-                    print(" (~>" + posting["boost_target"] + ")")
+                    print(" (~>" + posting["boost_target"] + " ; LEN: " + str(len(posting["post_text"])) + ")")
                     
                     try:
                         if config["enable_mastodon"]:
                             status = instance.status_post(posting["post_text"])
                         else:
-                            print("DRYRUN: not executing: instance.status_post()")
+                            ()#print("DRYRUN: not executing: instance.status_post()")
                             status = {"id": 0}
                         posting["status_id"] = status["id"]
                         for filterbot in filterbots:
@@ -486,7 +521,7 @@ def post_feeds():
                         if config["enable_mastodon"]:
                             status = instance.status_update(posting["status_id"], posting["post_text"])
                         else:
-                            print("DRYRUN: not executing: instance.status_update() ID \"" + posting["status_id"] + "\"")
+                            ()#print("DRYRUN: not executing: instance.status_update() ID \"" + posting["status_id"] + "\"")
                             status = {"id": 0}
                         posting["status_id"] = status["id"]
                     except:
@@ -514,7 +549,7 @@ def post_feeds():
                             if config["enable_mastodon"]:
                                 status = instance.status_reblog(status_id)
                             else:
-                                print("DRYRUN: not executing: instance.status_reblog(\"" + str(status_id) + "\")")
+                                ()#print("DRYRUN: not executing: instance.status_reblog(\"" + str(status_id) + "\")")
                         except:
                             print(timestamp() + " EXCEPTION while instance.status_reblog()")
                             print(str(status_id))
@@ -612,15 +647,8 @@ def cleanup(text, hashtags):
     for wrd in hashtag_wordlist:
         wrd = wrd.strip()
         if wrd != "" and wrd[0] != '#':
-            text = re.sub(r'\b' + wrd + r'\b(?!@)', '#' + wrd, text, 1)
-    
-    ht_bl2 = []
-    
-    for ht in hashtags:
-        if re.search(r"\b" + re.escape(ht[1:]) + r"\b", text):
-            ht_bl2.append(ht)
-    for ht in ht_bl2:
-        hashtags.remove(ht)
+            if re.search(r"\b" + re.escape(wrd) + r"\b", text):
+                hashtags.append("#" + wrd)
     
     return text.strip()
 

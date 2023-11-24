@@ -25,6 +25,12 @@ config = {
     # Debug and test flags
     
     ## Set True to enable actual mastodon postings (otherwise dryrun with output)
-    "enable_mastodon": False
+    "enable_mastodon": False,
+    
+    ## Default posting format
+    "template": "{title}\n\n{text}\n\n{url}\n\n{hashtags}",
+    
+    ## Max message size
+    "message_size": 496,
     
 }

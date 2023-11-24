@@ -15,3 +15,28 @@ hashtag_blacklist = [
     "#MedienUndWerbung",
     "#KulturUndFreizeit",
 ]
+
+## ÖWA-Category aliases
+category_aliases = {
+    "Nachrichten": "Chronik",
+    #"Politik Inland": "Politik Österreich",
+    "MedienUndWerbung": "Medien",
+    "Kultur: Bühne": "Kultur",
+    "ORF: TV-Programm": "TV-Programm",
+    "ORF: Radioprogramm": "Radioprogramm",
+    "Ratgeber: Gesundheit": "Gesundheit",
+    "KulturUndFreizeit": "Kultur",
+    "Fußball:BLG": "Fußball Bundesliga",
+    
+}
+
+oewa_sport_aliases = {
+    "Sportueberblick": "Sport",
+    "SkiAlpin": "Ski Alpin",
+    "SkiNordisch": "Ski Nordisch",
+    "USsport": "US-Sport",
+    "Sonstiges": "Sport",
+    
+}
+
+#Kultur: Bühne -> Bühne?
