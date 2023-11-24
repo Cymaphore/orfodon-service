@@ -16,63 +16,63 @@ feeds = [
         'id': 'burgenland',
         'url': 'https://rss.orf.at/burgenland.xml',
         'prefix': 'https://burgenland.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
         'id': 'kaernten',
         'url': 'https://rss.orf.at/kaernten.xml',
         'prefix': 'https://kaernten.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
         'id': 'niederoesterreich',
         'url': 'https://rss.orf.at/noe.xml',
         'prefix': 'https://noe.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
         'id': 'oberoesterreich',
         'url': 'https://rss.orf.at/ooe.xml',
         'prefix': 'https://ooe.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
         'id': 'salzburg',
         'url': 'https://rss.orf.at/salzburg.xml',
         'prefix': 'https://salzburg.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
         'id': 'steiermark',
         'url': 'https://rss.orf.at/steiermark.xml',
         'prefix': 'https://steiermark.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
         'id': 'tirol',
         'url': 'https://rss.orf.at/tirol.xml',
         'prefix': 'https://tirol.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
         'id': 'vorarlberg',
         'url': 'https://rss.orf.at/vorarlberg.xml',
         'prefix': 'https://vorarlberg.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
         'id': 'wien',
         'url': 'https://rss.orf.at/wien.xml',
         'prefix': 'https://wien.orf.at/stories/',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     
@@ -117,7 +117,7 @@ feeds = [
     {
         'id': 'oesterreich',
         'url': 'https://rss.orf.at/oesterreich.xml',
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     },
     {
@@ -140,7 +140,7 @@ feeds = [
                 'https://oesterreich.orf.at/stories/'
             ]
         },
-        "template": "{category}: {text} {url}\n\n{hashtags}",
+        "template": "{text} {url}\n\n{hashtags}",
         "hashtag_prefix": "_",
     }
 ]
