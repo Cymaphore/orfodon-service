@@ -19,7 +19,7 @@ hashtag_blacklist = [
 ## ÖWA-Category aliases
 category_aliases = {
     "Nachrichten": "Chronik",
-    #"Politik Inland": "Politik Österreich",
+    "Politik Inland": "Politik",
     "MedienUndWerbung": "Medien",
     "Kultur: Bühne": "Kultur",
     "ORF: TV-Programm": "TV-Programm",
