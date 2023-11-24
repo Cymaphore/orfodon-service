@@ -39,4 +39,9 @@ oewa_sport_aliases = {
     
 }
 
+oewa_bypass = [
+    "Inland",
+    "Ausland"
+]
+
 #Kultur: Bühne -> Bühne?

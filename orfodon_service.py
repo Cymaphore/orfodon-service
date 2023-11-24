@@ -59,6 +59,7 @@ from hashtag_modification import hashtag_replace
 from hashtag_modification import hashtag_blacklist
 from hashtag_modification import category_aliases
 from hashtag_modification import oewa_sport_aliases
+from hashtag_modification import oewa_bypass
 
 #############################################################################
 
@@ -192,6 +193,8 @@ def load_feeds():
                 
                 first_oewa = False
                 if "enable_oewa_sport" in feed and feed["enable_oewa_sport"]:
+                    first_oewa = True
+                if not category in oewa_bypass:
                     first_oewa = True
                 try:
                     ttags = entry.get('orfon_oewacategory', {}).get("rdf:resource", '')
