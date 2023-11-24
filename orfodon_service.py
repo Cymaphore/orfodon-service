@@ -337,6 +337,9 @@ def load_feeds():
                     post_text = feed["template"].format(**posting_data).strip()
                     #print(len(post_text))
                 
+                if "category" in oldPosting and oldPosting["category"] != category:
+                    edited = True
+                
                 posting = {
                     'text': raw_posting,
                     'post_text': post_text.strip(),
