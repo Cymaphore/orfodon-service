@@ -44,4 +44,18 @@ oewa_bypass = [
     "Ausland"
 ]
 
+cat_wl = [
+    "Gesundheit",
+    "Verkehr",
+    "Wissenschaft",
+    "Kultur",
+    "TV-Programm",
+    "Radioprogramm",
+    "Sport",
+    "Fußball",
+    "Fussball",
+    "Medien",
+    "Wetter",
+]
+
 #Kultur: Bühne -> Bühne?

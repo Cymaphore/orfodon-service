@@ -26,7 +26,6 @@
 # @todo Account mentioner ("der Standard" --> @derStandard)?
 # @todo extract top hashtags from current posts and add them to profile
 # @todo ORF_Topos as channel
-# @todo #xCat-Hashtags
 #
 
 #############################################################################
@@ -277,7 +276,7 @@ def load_feeds():
                     if "boost_target" in oldPosting and len(oldPosting["boost_target"]) > 0:
                         boost_target = oldPosting["boost_target"]
                         if "ts_story_details" in oldPosting:
-                            if ts_story_details < ts() - 600:
+                            if ts_story_details < (ts() - 600):
                                 story_details = get_story_details(url)
                                 ts_story_details = ts()
                                 if len(story_details["text"]) >= len(title):
@@ -337,8 +336,8 @@ def load_feeds():
                     post_text = feed["template"].format(**posting_data).strip()
                     #print(len(post_text))
                 
-                if "category" in oldPosting and oldPosting["category"] != category:
-                    edited = True
+                #if "category" in oldPosting and oldPosting["category"] != category:
+                #    edited = True
                 
                 posting = {
                     'text': raw_posting,
