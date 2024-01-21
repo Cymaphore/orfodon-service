@@ -123,6 +123,7 @@ feeds = [
     {
         'id': 'news',
         'url': 'https://rss.orf.at/news.xml',
+        'url_ticker': 'https://orf.at',
         'filterbots': {
             'news_lite': [
                 'https://oesterreich.orf.at/stories/'

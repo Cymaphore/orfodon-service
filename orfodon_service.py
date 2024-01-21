@@ -151,9 +151,11 @@ def load_feeds():
     global oldState
     
     for feed in feeds:
-        
+        get_ticker
         feedStateOld = oldState[feed["id"]]
         feedState = state[feed["id"]]
+        
+        feed_urls = []
         
         if "url" in feed:
             entries = feedparser.parse(feed["url"]).entries
@@ -165,6 +167,7 @@ def load_feeds():
                 title = entry.get('title')
                 text = entry.get('summary')
                 url = entry.get('link')
+                feed_urls.append(url)
                 category = entry.get('category')
                 raw_posting = ""
                 post_type_text = False
@@ -359,6 +362,40 @@ def load_feeds():
                 
                 feedState[url] = posting
         
+        if "url_ticker" in feed:
+            ticker_urls = get_ticker(feed["url_ticker"])
+            for url in ticker_urls:
+                if not url in feed_urls:
+                
+                    if url in feedStateOld:
+                        exists = True
+                        oldPosting = feedStateOld[url]
+                        if "status_id" in oldPosting:
+                            status_id = oldPosting["status_id"]
+                        if "posted" in oldPosting:
+                            posted = oldPosting["posted"]
+                        if "boosted" in oldPosting:
+                            boosted = oldPosting["boosted"]
+                            
+                    posting = {
+                        'text': '',
+                        'post_text': '',
+                        'url': url,
+                        'category': '',
+                        'post_type_text': False,
+                        'hashtags': '',
+                        'updated': False,
+                        'edited': False,
+                        'ts_story_details': 0,
+                        'ec_story_details': 0,
+                        'checksum_story_details': 0,
+                        'status_id': status_id,
+                        'posted': posted,
+                        'boosted': boosted,
+                        'boost_target': '',
+                        }
+                    feedState[url] = posting
+        
 #############################################################################
 
 ##
@@ -495,7 +532,7 @@ def post_feeds():
                     boosted = True
                     posting["boosted"] = True
 
-                if not boosted:
+                if not boosted and len(posting["post_text"]) > 0:
                     print("==============================================================================")
                     print(timestamp() + " ++ POST to " + feed["id"] + ": " + posting["post_text"])
                     print(" (~>" + posting["boost_target"] + " ; LEN: " + str(len(posting["post_text"])) + ")")
@@ -618,6 +655,44 @@ def get_story_details(url):
     
     try:
         retr["url"] = story.find("a").attrs["href"]
+    except:
+        ()
+    
+    return retr
+
+#############################################################################
+
+##
+# Load a ticker site and return it's links
+def get_ticker(url):
+    
+    retr = []
+    
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '3600',
+        'User-Agent': config["user_agent"]
+    }
+
+    if url is None:
+        return retr
+    
+    req = requests.get(url, headers)
+    soup = BeautifulSoup(req.content, 'html.parser')
+    ticker = soup.find("main", {"id": "content"})
+    
+    if ticker is None:
+        return retr
+    
+    try:
+        links = ticker.find_all("a")
+        if not links is None:
+            for link in links:
+                href = link.attrs["href"]
+                if "orf.at/stories/" in href and not "impressum" in href and not "darstellung" in href:
+                    retr.append(link.attrs["href"])
     except:
         ()
     
