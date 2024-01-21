@@ -376,6 +376,8 @@ def load_feeds():
                             posted = oldPosting["posted"]
                         if "boosted" in oldPosting:
                             boosted = oldPosting["boosted"]
+                    
+                    checksum_story_details = []
                             
                     posting = {
                         'text': '',
@@ -388,7 +390,7 @@ def load_feeds():
                         'edited': False,
                         'ts_story_details': 0,
                         'ec_story_details': 0,
-                        'checksum_story_details': 0,
+                        'checksum_story_details': checksum_story_details,
                         'status_id': status_id,
                         'posted': posted,
                         'boosted': boosted,
