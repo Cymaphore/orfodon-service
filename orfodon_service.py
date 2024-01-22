@@ -366,23 +366,33 @@ def load_feeds():
             ticker_urls = get_ticker(feed["url_ticker"])
             for url in ticker_urls:
                 if not url in feed_urls:
+                    
+                    status_id = 0
+                    posted = False
+                    boosted = False
                 
-                    if url in feedStateOld:
+                    vurl = "vurl_" + feed["id"] + "_" + url
+                    
+                    boost_target = url
+                    
+                    if vurl in feedStateOld:
                         exists = True
-                        oldPosting = feedStateOld[url]
+                        oldPosting = feedStateOld[vurl]
                         if "status_id" in oldPosting:
                             status_id = oldPosting["status_id"]
                         if "posted" in oldPosting:
                             posted = oldPosting["posted"]
                         if "boosted" in oldPosting:
                             boosted = oldPosting["boosted"]
+                        if "boost_target" in oldPosting:
+                            boost_target = oldPosting["boost_target"]
                     
                     checksum_story_details = []
                             
                     posting = {
                         'text': '',
                         'post_text': '',
-                        'url': url,
+                        'url': vurl,
                         'category': '',
                         'post_type_text': False,
                         'hashtags': '',
@@ -394,9 +404,9 @@ def load_feeds():
                         'status_id': status_id,
                         'posted': posted,
                         'boosted': boosted,
-                        'boost_target': '',
+                        'boost_target': boost_target,
                         }
-                    feedState[url] = posting
+                    feedState[vurl] = posting
         
 #############################################################################
 
@@ -694,7 +704,7 @@ def get_ticker(url):
             for link in links:
                 href = link.attrs["href"]
                 if "orf.at/stories/" in href and not "impressum" in href and not "darstellung" in href:
-                    retr.append(link.attrs["href"])
+                    retr.append(link.attrs["href"].strip())
     except:
         ()
     
